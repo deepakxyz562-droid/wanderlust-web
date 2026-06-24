@@ -32,9 +32,9 @@ export function Header() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("destinations")
-        .select("name,slug")
+        .select("title,slug")
         .eq("is_published", true)
-        .order("name");
+        .order("title");
       if (error) throw error;
       return data ?? [];
     },
@@ -42,7 +42,7 @@ export function Header() {
   });
   const countryItems =
     destinations && destinations.length > 0
-      ? destinations.map((d) => ({ slug: d.slug, label: d.name }))
+      ? destinations.map((d) => ({ slug: d.slug, label: d.title }))
       : FEATURED_COUNTRIES;
 
   return (
