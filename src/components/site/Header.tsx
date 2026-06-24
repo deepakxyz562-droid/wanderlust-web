@@ -75,7 +75,18 @@ export function Header() {
             </a>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden lg:inline text-primary-foreground/80">{SITE.tagline}</span>
+            <form onSubmit={submitSearch} className="hidden lg:flex items-center bg-primary-foreground/10 hover:bg-primary-foreground/15 focus-within:bg-primary-foreground/20 rounded-full pl-3 pr-1 py-0.5 transition-colors">
+              <Search className="h-3.5 w-3.5 text-primary-foreground/70" />
+              <input
+                value={searchQ}
+                onChange={(e) => setSearchQ(e.target.value)}
+                type="search"
+                placeholder="Search tours..."
+                aria-label="Search tours"
+                className="bg-transparent text-xs placeholder:text-primary-foreground/60 px-2 py-1 w-44 focus:outline-none"
+              />
+            </form>
+            <span className="hidden xl:inline text-primary-foreground/80">{SITE.tagline}</span>
             <a href={whatsappLink()} target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">WhatsApp</a>
             <Link to="/auth" className="hover:text-gold transition-colors">Admin</Link>
           </div>
