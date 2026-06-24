@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/logo.asset.json";
+import logo from "@/assets/etb-logo.png.asset.json";
 import { SITE } from "@/lib/site";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -75,11 +75,13 @@ function AdminPage() {
           <TabsList className="bg-card">
             <TabsTrigger value="tours">Tours</TabsTrigger>
             <TabsTrigger value="destinations">Destinations</TabsTrigger>
+            <TabsTrigger value="cities">Cities</TabsTrigger>
             <TabsTrigger value="blogs">Blog posts</TabsTrigger>
             <TabsTrigger value="enquiries">Enquiries</TabsTrigger>
           </TabsList>
           <TabsContent value="tours" className="mt-6"><ToursAdmin /></TabsContent>
           <TabsContent value="destinations" className="mt-6"><DestinationsAdmin /></TabsContent>
+          <TabsContent value="cities" className="mt-6"><CitiesAdmin /></TabsContent>
           <TabsContent value="blogs" className="mt-6"><BlogsAdmin /></TabsContent>
           <TabsContent value="enquiries" className="mt-6"><EnquiriesAdmin /></TabsContent>
         </Tabs>
