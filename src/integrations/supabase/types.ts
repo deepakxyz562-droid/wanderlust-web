@@ -169,6 +169,7 @@ export type Database = {
       }
       tours: {
         Row: {
+          category: string | null
           created_at: string
           currency: string
           description: string | null
@@ -189,9 +190,11 @@ export type Database = {
           short_description: string | null
           slug: string
           title: string
+          travel_styles: string[]
           updated_at: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           currency?: string
           description?: string | null
@@ -212,9 +215,11 @@ export type Database = {
           short_description?: string | null
           slug: string
           title: string
+          travel_styles?: string[]
           updated_at?: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           currency?: string
           description?: string | null
@@ -235,6 +240,7 @@ export type Database = {
           short_description?: string | null
           slug?: string
           title?: string
+          travel_styles?: string[]
           updated_at?: string
         }
         Relationships: [

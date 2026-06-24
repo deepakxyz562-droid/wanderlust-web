@@ -18,10 +18,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TravelStylesStyleRouteImport } from './routes/travel-styles.$style'
 import { Route as ToursSlugRouteImport } from './routes/tours.$slug'
 import { Route as DestinationsSlugRouteImport } from './routes/destinations.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as ToursCategoryCategoryRouteImport } from './routes/tours.category.$category'
 
 const ToursRoute = ToursRouteImport.update({
   id: '/tours',
@@ -67,6 +69,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TravelStylesStyleRoute = TravelStylesStyleRouteImport.update({
+  id: '/travel-styles/$style',
+  path: '/travel-styles/$style',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToursSlugRoute = ToursSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -87,6 +94,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ToursCategoryCategoryRoute = ToursCategoryCategoryRouteImport.update({
+  id: '/category/$category',
+  path: '/category/$category',
+  getParentRoute: () => ToursRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -101,6 +113,8 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
   '/tours/$slug': typeof ToursSlugRoute
+  '/travel-styles/$style': typeof TravelStylesStyleRoute
+  '/tours/category/$category': typeof ToursCategoryCategoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -115,6 +129,8 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
   '/tours/$slug': typeof ToursSlugRoute
+  '/travel-styles/$style': typeof TravelStylesStyleRoute
+  '/tours/category/$category': typeof ToursCategoryCategoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -131,6 +147,8 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
   '/tours/$slug': typeof ToursSlugRoute
+  '/travel-styles/$style': typeof TravelStylesStyleRoute
+  '/tours/category/$category': typeof ToursCategoryCategoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,6 +165,8 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/destinations/$slug'
     | '/tours/$slug'
+    | '/travel-styles/$style'
+    | '/tours/category/$category'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -161,6 +181,8 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/destinations/$slug'
     | '/tours/$slug'
+    | '/travel-styles/$style'
+    | '/tours/category/$category'
   id:
     | '__root__'
     | '/'
@@ -176,6 +198,8 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/destinations/$slug'
     | '/tours/$slug'
+    | '/travel-styles/$style'
+    | '/tours/category/$category'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -188,6 +212,7 @@ export interface RootRouteChildren {
   DestinationsRoute: typeof DestinationsRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ToursRoute: typeof ToursRouteWithChildren
+  TravelStylesStyleRoute: typeof TravelStylesStyleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -255,6 +280,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/travel-styles/$style': {
+      id: '/travel-styles/$style'
+      path: '/travel-styles/$style'
+      fullPath: '/travel-styles/$style'
+      preLoaderRoute: typeof TravelStylesStyleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tours/$slug': {
       id: '/tours/$slug'
       path: '/$slug'
@@ -282,6 +314,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/tours/category/$category': {
+      id: '/tours/category/$category'
+      path: '/category/$category'
+      fullPath: '/tours/category/$category'
+      preLoaderRoute: typeof ToursCategoryCategoryRouteImport
+      parentRoute: typeof ToursRoute
     }
   }
 }
@@ -322,10 +361,12 @@ const DestinationsRouteWithChildren = DestinationsRoute._addFileChildren(
 
 interface ToursRouteChildren {
   ToursSlugRoute: typeof ToursSlugRoute
+  ToursCategoryCategoryRoute: typeof ToursCategoryCategoryRoute
 }
 
 const ToursRouteChildren: ToursRouteChildren = {
   ToursSlugRoute: ToursSlugRoute,
+  ToursCategoryCategoryRoute: ToursCategoryCategoryRoute,
 }
 
 const ToursRouteWithChildren = ToursRoute._addFileChildren(ToursRouteChildren)
@@ -340,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   DestinationsRoute: DestinationsRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ToursRoute: ToursRouteWithChildren,
+  TravelStylesStyleRoute: TravelStylesStyleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
