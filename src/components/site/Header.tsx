@@ -1,7 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, Mail, Menu, Phone, X } from "lucide-react";
+import { ChevronDown, Mail, Menu, Phone, Search, X } from "lucide-react";
 import logo from "@/assets/logo-transparent.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { SITE, whatsappLink } from "@/lib/site";
@@ -18,6 +18,16 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [searchQ, setSearchQ] = useState("");
+  const navigate = useNavigate();
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQ.trim();
+    if (!q) return;
+    navigate({ to: "/tours", search: { q } });
+    setOpen(false);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -65,7 +75,18 @@ export function Header() {
             </a>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden lg:inline text-primary-foreground/80">{SITE.tagline}</span>
+            <form onSubmit={submitSearch} className="hidden lg:flex items-center bg-primary-foreground/10 hover:bg-primary-foreground/15 focus-within:bg-primary-foreground/20 rounded-full pl-3 pr-1 py-0.5 transition-colors">
+              <Search className="h-3.5 w-3.5 text-primary-foreground/70" />
+              <input
+                value={searchQ}
+                onChange={(e) => setSearchQ(e.target.value)}
+                type="search"
+                placeholder="Search tours..."
+                aria-label="Search tours"
+                className="bg-transparent text-xs placeholder:text-primary-foreground/60 px-2 py-1 w-44 focus:outline-none"
+              />
+            </form>
+            <span className="hidden xl:inline text-primary-foreground/80">{SITE.tagline}</span>
             <a href={whatsappLink()} target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">WhatsApp</a>
             <Link to="/auth" className="hover:text-gold transition-colors">Admin</Link>
           </div>

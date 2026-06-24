@@ -8,17 +8,21 @@ import { PageHeader } from "./tours";
 
 export const Route = createFileRoute("/tours/")({
   component: ToursIndex,
+  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : "" }),
 });
 
 function ToursIndex() {
+  const { q } = Route.useSearch();
   const { data, isLoading } = useQuery({
-    queryKey: ["tours"],
+    queryKey: ["tours", q],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("tours")
         .select("id,title,slug,short_description,duration_days,price_from,currency,featured_image")
         .eq("is_published", true)
         .order("created_at", { ascending: false });
+      if (q) query = query.or(`title.ilike.%${q}%,short_description.ilike.%${q}%`);
+      const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
     },
@@ -26,7 +30,7 @@ function ToursIndex() {
 
   return (
     <SiteLayout>
-      <PageHeader eyebrow="Signature Journeys" title="All Tours" subtitle="Crafted itineraries across Europe's most loved destinations." />
+      <PageHeader eyebrow="Signature Journeys" title={q ? `Search: "${q}"` : "All Tours"} subtitle="Crafted itineraries across Europe's most loved destinations." />
       <section className="container-page py-16">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {isLoading && Array.from({ length: 6 }).map((_, i) => (
