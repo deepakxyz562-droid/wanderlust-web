@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, Menu, X } from "lucide-react";
-import logo from "@/assets/logo.asset.json";
+import { ChevronDown, Mail, Menu, Phone, X } from "lucide-react";
+import logo from "@/assets/logo-transparent.png.asset.json";
 import { Button } from "@/components/ui/button";
-import { SITE } from "@/lib/site";
+import { SITE, whatsappLink } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
 import { FEATURED_COUNTRIES, TOUR_CATEGORIES, TRAVEL_STYLES } from "@/lib/menu";
 
