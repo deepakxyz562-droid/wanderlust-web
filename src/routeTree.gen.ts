@@ -18,6 +18,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ToursIndexRouteImport } from './routes/tours.index'
+import { Route as DestinationsIndexRouteImport } from './routes/destinations.index'
 import { Route as TravelStylesStyleRouteImport } from './routes/travel-styles.$style'
 import { Route as ToursSlugRouteImport } from './routes/tours.$slug'
 import { Route as DestinationsSlugRouteImport } from './routes/destinations.$slug'
@@ -69,6 +71,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToursIndexRoute = ToursIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ToursRoute,
+} as any)
+const DestinationsIndexRoute = DestinationsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DestinationsRoute,
+} as any)
 const TravelStylesStyleRoute = TravelStylesStyleRouteImport.update({
   id: '/travel-styles/$style',
   path: '/travel-styles/$style',
@@ -114,6 +126,8 @@ export interface FileRoutesByFullPath {
   '/destinations/$slug': typeof DestinationsSlugRoute
   '/tours/$slug': typeof ToursSlugRoute
   '/travel-styles/$style': typeof TravelStylesStyleRoute
+  '/destinations/': typeof DestinationsIndexRoute
+  '/tours/': typeof ToursIndexRoute
   '/tours/category/$category': typeof ToursCategoryCategoryRoute
 }
 export interface FileRoutesByTo {
@@ -122,14 +136,14 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
-  '/destinations': typeof DestinationsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/tours': typeof ToursRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
   '/tours/$slug': typeof ToursSlugRoute
   '/travel-styles/$style': typeof TravelStylesStyleRoute
+  '/destinations': typeof DestinationsIndexRoute
+  '/tours': typeof ToursIndexRoute
   '/tours/category/$category': typeof ToursCategoryCategoryRoute
 }
 export interface FileRoutesById {
@@ -148,6 +162,8 @@ export interface FileRoutesById {
   '/destinations/$slug': typeof DestinationsSlugRoute
   '/tours/$slug': typeof ToursSlugRoute
   '/travel-styles/$style': typeof TravelStylesStyleRoute
+  '/destinations/': typeof DestinationsIndexRoute
+  '/tours/': typeof ToursIndexRoute
   '/tours/category/$category': typeof ToursCategoryCategoryRoute
 }
 export interface FileRouteTypes {
@@ -166,6 +182,8 @@ export interface FileRouteTypes {
     | '/destinations/$slug'
     | '/tours/$slug'
     | '/travel-styles/$style'
+    | '/destinations/'
+    | '/tours/'
     | '/tours/category/$category'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -174,14 +192,14 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/contact'
-    | '/destinations'
     | '/sitemap.xml'
-    | '/tours'
     | '/admin'
     | '/blog/$slug'
     | '/destinations/$slug'
     | '/tours/$slug'
     | '/travel-styles/$style'
+    | '/destinations'
+    | '/tours'
     | '/tours/category/$category'
   id:
     | '__root__'
@@ -199,6 +217,8 @@ export interface FileRouteTypes {
     | '/destinations/$slug'
     | '/tours/$slug'
     | '/travel-styles/$style'
+    | '/destinations/'
+    | '/tours/'
     | '/tours/category/$category'
   fileRoutesById: FileRoutesById
 }
@@ -280,6 +300,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tours/': {
+      id: '/tours/'
+      path: '/'
+      fullPath: '/tours/'
+      preLoaderRoute: typeof ToursIndexRouteImport
+      parentRoute: typeof ToursRoute
+    }
+    '/destinations/': {
+      id: '/destinations/'
+      path: '/'
+      fullPath: '/destinations/'
+      preLoaderRoute: typeof DestinationsIndexRouteImport
+      parentRoute: typeof DestinationsRoute
+    }
     '/travel-styles/$style': {
       id: '/travel-styles/$style'
       path: '/travel-styles/$style'
@@ -349,10 +383,12 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 interface DestinationsRouteChildren {
   DestinationsSlugRoute: typeof DestinationsSlugRoute
+  DestinationsIndexRoute: typeof DestinationsIndexRoute
 }
 
 const DestinationsRouteChildren: DestinationsRouteChildren = {
   DestinationsSlugRoute: DestinationsSlugRoute,
+  DestinationsIndexRoute: DestinationsIndexRoute,
 }
 
 const DestinationsRouteWithChildren = DestinationsRoute._addFileChildren(
@@ -361,11 +397,13 @@ const DestinationsRouteWithChildren = DestinationsRoute._addFileChildren(
 
 interface ToursRouteChildren {
   ToursSlugRoute: typeof ToursSlugRoute
+  ToursIndexRoute: typeof ToursIndexRoute
   ToursCategoryCategoryRoute: typeof ToursCategoryCategoryRoute
 }
 
 const ToursRouteChildren: ToursRouteChildren = {
   ToursSlugRoute: ToursSlugRoute,
+  ToursIndexRoute: ToursIndexRoute,
   ToursCategoryCategoryRoute: ToursCategoryCategoryRoute,
 }
 
