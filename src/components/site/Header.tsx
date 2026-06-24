@@ -109,7 +109,7 @@ export function Header() {
           <img
             src={logo.url}
             alt={SITE.name}
-            className="h-20 md:h-[120px] w-auto object-contain"
+            className="h-[65px] w-auto object-contain"
           />
         </Link>
 
