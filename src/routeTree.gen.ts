@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ToursRouteImport } from './routes/tours'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as MiceRouteImport } from './routes/mice'
+import { Route as FaqsRouteImport } from './routes/faqs'
+import { Route as EtbTransportsRouteImport } from './routes/etb-transports'
 import { Route as DestinationsRouteImport } from './routes/destinations'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -35,6 +38,21 @@ const ToursRoute = ToursRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MiceRoute = MiceRouteImport.update({
+  id: '/mice',
+  path: '/mice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqsRoute = FaqsRouteImport.update({
+  id: '/faqs',
+  path: '/faqs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EtbTransportsRoute = EtbTransportsRouteImport.update({
+  id: '/etb-transports',
+  path: '/etb-transports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DestinationsRoute = DestinationsRouteImport.update({
@@ -119,6 +137,9 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/destinations': typeof DestinationsRouteWithChildren
+  '/etb-transports': typeof EtbTransportsRoute
+  '/faqs': typeof FaqsRoute
+  '/mice': typeof MiceRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tours': typeof ToursRouteWithChildren
   '/admin': typeof AuthenticatedAdminRoute
@@ -136,6 +157,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
+  '/etb-transports': typeof EtbTransportsRoute
+  '/faqs': typeof FaqsRoute
+  '/mice': typeof MiceRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -155,6 +179,9 @@ export interface FileRoutesById {
   '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/destinations': typeof DestinationsRouteWithChildren
+  '/etb-transports': typeof EtbTransportsRoute
+  '/faqs': typeof FaqsRoute
+  '/mice': typeof MiceRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tours': typeof ToursRouteWithChildren
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -175,6 +202,9 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/destinations'
+    | '/etb-transports'
+    | '/faqs'
+    | '/mice'
     | '/sitemap.xml'
     | '/tours'
     | '/admin'
@@ -192,6 +222,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/contact'
+    | '/etb-transports'
+    | '/faqs'
+    | '/mice'
     | '/sitemap.xml'
     | '/admin'
     | '/blog/$slug'
@@ -210,6 +243,9 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/destinations'
+    | '/etb-transports'
+    | '/faqs'
+    | '/mice'
     | '/sitemap.xml'
     | '/tours'
     | '/_authenticated/admin'
@@ -230,6 +266,9 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRouteWithChildren
   ContactRoute: typeof ContactRoute
   DestinationsRoute: typeof DestinationsRouteWithChildren
+  EtbTransportsRoute: typeof EtbTransportsRoute
+  FaqsRoute: typeof FaqsRoute
+  MiceRoute: typeof MiceRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ToursRoute: typeof ToursRouteWithChildren
   TravelStylesStyleRoute: typeof TravelStylesStyleRoute
@@ -249,6 +288,27 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mice': {
+      id: '/mice'
+      path: '/mice'
+      fullPath: '/mice'
+      preLoaderRoute: typeof MiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faqs': {
+      id: '/faqs'
+      path: '/faqs'
+      fullPath: '/faqs'
+      preLoaderRoute: typeof FaqsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/etb-transports': {
+      id: '/etb-transports'
+      path: '/etb-transports'
+      fullPath: '/etb-transports'
+      preLoaderRoute: typeof EtbTransportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/destinations': {
@@ -417,6 +477,9 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRouteWithChildren,
   ContactRoute: ContactRoute,
   DestinationsRoute: DestinationsRouteWithChildren,
+  EtbTransportsRoute: EtbTransportsRoute,
+  FaqsRoute: FaqsRoute,
+  MiceRoute: MiceRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ToursRoute: ToursRouteWithChildren,
   TravelStylesStyleRoute: TravelStylesStyleRoute,

@@ -48,6 +48,19 @@ function DestinationDetail() {
       return data ?? [];
     },
   });
+  const { data: cities } = useQuery({
+    queryKey: ["dest-cities", d.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("cities")
+        .select("id,name,slug,short_description,featured_image,sort_order")
+        .eq("destination_id", d.id)
+        .eq("is_published", true)
+        .order("sort_order")
+        .order("name");
+      return data ?? [];
+    },
+  });
 
   return (
     <SiteLayout>
@@ -67,10 +80,35 @@ function DestinationDetail() {
         <p className="text-lg text-foreground/85 leading-relaxed whitespace-pre-line">{d.description ?? d.short_description}</p>
       </section>
 
+      {(cities ?? []).length > 0 && (
+        <section className="container-page pb-16">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <span className="text-xs uppercase tracking-[0.25em] text-gold font-semibold">Explore the city</span>
+              <h2 className="font-display text-3xl md:text-4xl text-primary mt-2">Top places in {d.title}</h2>
+            </div>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {cities!.map((c) => (
+              <article key={c.id} className="group rounded-2xl bg-card overflow-hidden shadow-card hover:shadow-elegant transition">
+                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                  {c.featured_image && <img src={c.featured_image} alt={c.name} loading="lazy" className="h-full w-full object-cover group-hover:scale-105 transition-transform" />}
+                </div>
+                <div className="p-5">
+                  <h3 className="font-display text-xl font-semibold text-primary">{c.name}</h3>
+                  {c.short_description && <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{c.short_description}</p>}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
       {(tours ?? []).length > 0 && (
         <section className="bg-secondary/40 py-16">
           <div className="container-page">
-            <h2 className="font-display text-3xl text-primary mb-8">Tours in {d.title}</h2>
+            <span className="text-xs uppercase tracking-[0.25em] text-gold font-semibold">Holiday packages</span>
+            <h2 className="font-display text-3xl md:text-4xl text-primary mt-2 mb-8">{d.title} tour packages</h2>
             <div className="grid gap-6 md:grid-cols-3">
               {tours!.map((t) => (
                 <Link key={t.id} to="/tours/$slug" params={{ slug: t.slug }} className="group block rounded-2xl bg-card overflow-hidden shadow-card hover:shadow-elegant transition">
