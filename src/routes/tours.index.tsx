@@ -30,7 +30,7 @@ function ToursIndex() {
 
   return (
     <SiteLayout>
-      <PageHeader eyebrow="Signature Journeys" title="All Tours" subtitle="Crafted itineraries across Europe's most loved destinations." />
+      <PageHeader eyebrow="Signature Journeys" title={q ? `Search: "${q}"` : "All Tours"} subtitle="Crafted itineraries across Europe's most loved destinations." />
       <section className="container-page py-16">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {isLoading && Array.from({ length: 6 }).map((_, i) => (
