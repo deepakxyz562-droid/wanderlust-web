@@ -467,3 +467,106 @@ function Row({ title, subtitle, image, edit, onDelete }: { title: string; subtit
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="space-y-1.5"><Label>{label}</Label>{children}</div>;
 }
+
+/* ---------- CITIES ---------- */
+function CitiesAdmin() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-cities"],
+    queryFn: async () => (await supabase.from("cities").select("*, destinations(title)").order("sort_order").order("name")).data ?? [],
+  });
+  const destOptions = useQuery({
+    queryKey: ["admin-dest-options"],
+    queryFn: async () => (await supabase.from("destinations").select("id,title").order("title")).data ?? [],
+  });
+  return (
+    <ListShell
+      title="Cities (Explore the city)"
+      isLoading={isLoading}
+      action={<CityDialog destinations={destOptions.data ?? []} onSaved={() => qc.invalidateQueries({ queryKey: ["admin-cities"] })} />}
+    >
+      {(data ?? []).map((c: any) => (
+        <Row
+          key={c.id}
+          title={c.name}
+          subtitle={`${c.destinations?.title ?? "—"} · /${c.slug} · ${c.is_published ? "Published" : "Draft"}`}
+          image={c.featured_image}
+          edit={<CityDialog city={c} destinations={destOptions.data ?? []} onSaved={() => qc.invalidateQueries({ queryKey: ["admin-cities"] })} />}
+          onDelete={async () => {
+            if (!confirm(`Delete "${c.name}"?`)) return;
+            const { error } = await supabase.from("cities").delete().eq("id", c.id);
+            if (error) return toast.error(error.message);
+            toast.success("Deleted");
+            qc.invalidateQueries({ queryKey: ["admin-cities"] });
+          }}
+        />
+      ))}
+    </ListShell>
+  );
+}
+
+function CityDialog({ city, destinations, onSaved }: { city?: any; destinations: { id: string; title: string }[]; onSaved: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const editing = !!city;
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const name = String(fd.get("name") ?? "").trim();
+    const destination_id = String(fd.get("destination_id") ?? "");
+    if (!name) return toast.error("Name required");
+    if (!destination_id) return toast.error("Destination required");
+    const payload: any = {
+      name,
+      destination_id,
+      slug: String(fd.get("slug") ?? "") || slugify(name),
+      short_description: String(fd.get("short_description") ?? ""),
+      description: String(fd.get("description") ?? ""),
+      featured_image: String(fd.get("featured_image") ?? "") || null,
+      sort_order: Number(fd.get("sort_order")) || 0,
+      is_published: fd.get("is_published") === "on",
+    };
+    setBusy(true);
+    const res = editing
+      ? await supabase.from("cities").update(payload).eq("id", city.id)
+      : await supabase.from("cities").insert(payload);
+    setBusy(false);
+    if (res.error) return toast.error(res.error.message);
+    toast.success(editing ? "Updated" : "Created");
+    setOpen(false); onSaved();
+  }
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {editing ? <Button size="sm" variant="outline"><Pencil className="h-4 w-4" /></Button> : <Button className="bg-primary text-primary-foreground hover:bg-primary-glow"><Plus className="h-4 w-4 mr-1" /> New city</Button>}
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader><DialogTitle>{editing ? "Edit city" : "New city"}</DialogTitle></DialogHeader>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Name *"><Input name="name" required defaultValue={city?.name} /></Field>
+            <Field label="Destination *">
+              <select name="destination_id" required defaultValue={city?.destination_id ?? ""} className="h-9 w-full rounded-md border bg-background px-3 text-sm">
+                <option value="">— Select —</option>
+                {destinations.map((d) => <option key={d.id} value={d.id}>{d.title}</option>)}
+              </select>
+            </Field>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Slug"><Input name="slug" defaultValue={city?.slug} placeholder="auto from name" /></Field>
+            <Field label="Sort order"><Input name="sort_order" type="number" defaultValue={city?.sort_order ?? 0} /></Field>
+          </div>
+          <Field label="Short description"><Input name="short_description" defaultValue={city?.short_description ?? ""} /></Field>
+          <Field label="Full description"><Textarea name="description" rows={5} defaultValue={city?.description ?? ""} /></Field>
+          <Field label="Featured image URL"><Input name="featured_image" defaultValue={city?.featured_image ?? ""} placeholder="https://..." /></Field>
+          <label className="flex items-center gap-2 text-sm"><Switch name="is_published" defaultChecked={city?.is_published ?? true} /> Published</label>
+          <DialogFooter>
+            <Button type="submit" disabled={busy} className="bg-primary text-primary-foreground hover:bg-primary-glow">
+              {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />} {editing ? "Save changes" : "Create city"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
