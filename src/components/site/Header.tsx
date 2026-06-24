@@ -1,10 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, Menu, X } from "lucide-react";
-import logo from "@/assets/logo.asset.json";
+import { ChevronDown, Mail, Menu, Phone, X } from "lucide-react";
+import logo from "@/assets/logo-transparent.png.asset.json";
 import { Button } from "@/components/ui/button";
-import { SITE } from "@/lib/site";
+import { SITE, whatsappLink } from "@/lib/site";
 import { supabase } from "@/integrations/supabase/client";
 import { FEATURED_COUNTRIES, TOUR_CATEGORIES, TRAVEL_STYLES } from "@/lib/menu";
 
@@ -50,16 +50,31 @@ export function Header() {
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
           ? "bg-background/95 backdrop-blur border-b border-border shadow-sm"
-          : "bg-background/70 backdrop-blur-sm"
+          : "bg-background/80 backdrop-blur-sm"
       }`}
     >
-      <div className="container-page flex items-center justify-between h-20">
-        <Link to="/" className="flex items-center gap-3" aria-label={SITE.name}>
-          <img src={logo.url} alt={SITE.name} width={48} height={48} className="h-12 w-12 object-contain" />
-          <div className="hidden sm:flex flex-col leading-tight">
-            <span className="font-display text-lg font-bold text-primary tracking-tight">EUROPE</span>
-            <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Tourism Bureau</span>
+      {/* Top bar */}
+      <div className="hidden md:block bg-primary text-primary-foreground text-xs">
+        <div className="w-full px-6 lg:px-10 flex items-center justify-between h-9">
+          <div className="flex items-center gap-5">
+            <a href={`tel:${SITE.phone}`} className="inline-flex items-center gap-1.5 hover:text-gold transition-colors">
+              <Phone className="h-3.5 w-3.5" /> {SITE.phone}
+            </a>
+            <a href={`mailto:${SITE.email}`} className="inline-flex items-center gap-1.5 hover:text-gold transition-colors">
+              <Mail className="h-3.5 w-3.5" /> {SITE.email}
+            </a>
           </div>
+          <div className="flex items-center gap-4">
+            <span className="hidden lg:inline text-primary-foreground/80">{SITE.tagline}</span>
+            <a href={whatsappLink()} target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">WhatsApp</a>
+            <Link to="/auth" className="hover:text-gold transition-colors">Admin</Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full px-6 lg:px-10 flex items-center justify-between h-24">
+        <Link to="/" className="flex items-center" aria-label={SITE.name}>
+          <img src={logo.url} alt={SITE.name} className="h-16 md:h-20 w-auto object-contain" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">
@@ -136,7 +151,7 @@ export function Header() {
 
       {open && (
         <div className="lg:hidden border-t border-border bg-background">
-          <nav className="container-page py-3 flex flex-col gap-1">
+          <nav className="w-full px-6 lg:px-10 py-3 flex flex-col gap-1">
             <MobileLink to="/" onClick={() => setOpen(false)}>Home</MobileLink>
 
             <MobileGroup
