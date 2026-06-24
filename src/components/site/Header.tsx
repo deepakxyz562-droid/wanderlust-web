@@ -151,7 +151,7 @@ export function Header() {
 
       {open && (
         <div className="lg:hidden border-t border-border bg-background">
-          <nav className="container-page py-3 flex flex-col gap-1">
+          <nav className="w-full px-6 lg:px-10 py-3 flex flex-col gap-1">
             <MobileLink to="/" onClick={() => setOpen(false)}>Home</MobileLink>
 
             <MobileGroup
