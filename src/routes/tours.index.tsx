@@ -8,17 +8,21 @@ import { PageHeader } from "./tours";
 
 export const Route = createFileRoute("/tours/")({
   component: ToursIndex,
+  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : "" }),
 });
 
 function ToursIndex() {
+  const { q } = Route.useSearch();
   const { data, isLoading } = useQuery({
-    queryKey: ["tours"],
+    queryKey: ["tours", q],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("tours")
         .select("id,title,slug,short_description,duration_days,price_from,currency,featured_image")
         .eq("is_published", true)
         .order("created_at", { ascending: false });
+      if (q) query = query.or(`title.ilike.%${q}%,short_description.ilike.%${q}%`);
+      const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
     },
