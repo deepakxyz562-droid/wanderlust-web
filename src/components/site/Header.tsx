@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Mail, Menu, Phone, Search, X } from "lucide-react";
 import logo from "@/assets/etb-logo.png.asset.json";
 import { Button } from "@/components/ui/button";
-import { SITE, whatsappLink } from "@/lib/site";
+import { SITE } from "@/lib/site";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ABOUT_LINKS,
@@ -14,6 +15,7 @@ import {
 } from "@/lib/menu";
 
 export function Header() {
+  const { settings, whatsappLink } = useSiteSettings();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
@@ -78,11 +80,11 @@ export function Header() {
       <div className="hidden md:block bg-primary text-primary-foreground text-xs">
         <div className="w-full px-6 lg:px-10 flex items-center justify-between h-9">
           <div className="flex items-center gap-5">
-            <a href={`tel:${SITE.phone}`} className="inline-flex items-center gap-1.5 hover:text-gold transition-colors">
-              <Phone className="h-3.5 w-3.5" /> {SITE.phone}
+            <a href={`tel:${settings.phone}`} className="inline-flex items-center gap-1.5 hover:text-gold transition-colors">
+              <Phone className="h-3.5 w-3.5" /> {settings.phone}
             </a>
-            <a href={`mailto:${SITE.email}`} className="inline-flex items-center gap-1.5 hover:text-gold transition-colors">
-              <Mail className="h-3.5 w-3.5" /> {SITE.email}
+            <a href={`mailto:${settings.email}`} className="inline-flex items-center gap-1.5 hover:text-gold transition-colors">
+              <Mail className="h-3.5 w-3.5" /> {settings.email}
             </a>
           </div>
           <div className="flex items-center gap-4">
@@ -97,7 +99,7 @@ export function Header() {
                 className="bg-transparent text-xs placeholder:text-primary-foreground/60 px-2 py-1 w-44 focus:outline-none"
               />
             </form>
-            <span className="hidden xl:inline text-primary-foreground/80">{SITE.tagline}</span>
+            <span className="hidden xl:inline text-primary-foreground/80">{settings.tagline}</span>
             <a href={whatsappLink()} target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">WhatsApp</a>
             <Link to="/auth" className="hover:text-gold transition-colors">Admin</Link>
           </div>
@@ -105,10 +107,10 @@ export function Header() {
       </div>
 
       <div className="w-full px-6 lg:px-10 flex items-center justify-between gap-6 py-2">
-        <Link to="/" className="flex items-center shrink-0" aria-label={SITE.name}>
+        <Link to="/" className="flex items-center shrink-0" aria-label={settings.name}>
           <img
-            src={logo.url}
-            alt={SITE.name}
+            src={settings.logoUrl || logo.url}
+            alt={settings.name}
             className="h-[65px] w-auto object-contain"
           />
         </Link>
