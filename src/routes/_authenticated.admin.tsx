@@ -621,3 +621,237 @@ function CityDialog({ city, destinations, onSaved }: { city?: any; destinations:
     </Dialog>
   );
 }
+
+/* ---------- DASHBOARD ---------- */
+function DashboardAdmin() {
+  const { data } = useQuery({
+    queryKey: ["admin-dashboard"],
+    queryFn: async () => {
+      const [tours, dests, blogs, enq, recent] = await Promise.all([
+        supabase.from("tours").select("id", { count: "exact", head: true }),
+        supabase.from("destinations").select("id", { count: "exact", head: true }),
+        supabase.from("blogs").select("id", { count: "exact", head: true }),
+        supabase.from("enquiries").select("id", { count: "exact", head: true }),
+        supabase.from("enquiries").select("*").order("created_at", { ascending: false }).limit(8),
+      ]);
+      return {
+        tours: tours.count ?? 0,
+        destinations: dests.count ?? 0,
+        blogs: blogs.count ?? 0,
+        enquiries: enq.count ?? 0,
+        recent: recent.data ?? [],
+      };
+    },
+  });
+  const cards = [
+    { label: "Tours", value: data?.tours ?? 0, icon: Map, to: "tours" as const },
+    { label: "Destinations", value: data?.destinations ?? 0, icon: MapPin, to: "destinations" as const },
+    { label: "Blog Posts", value: data?.blogs ?? 0, icon: BookOpen, to: "blogs" as const },
+    { label: "Enquiries", value: data?.enquiries ?? 0, icon: Inbox, to: "enquiries" as const },
+  ];
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {cards.map((c) => (
+          <div key={c.label} className="rounded-2xl bg-card border shadow-card p-5">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">{c.label}</div>
+              <c.icon className="h-5 w-5 text-gold" />
+            </div>
+            <div className="font-display text-3xl text-primary mt-2">{c.value}</div>
+          </div>
+        ))}
+      </div>
+      <div className="rounded-2xl bg-card border shadow-card overflow-hidden">
+        <div className="p-5 border-b">
+          <h2 className="font-display text-xl text-primary">Recent enquiries</h2>
+        </div>
+        <ul className="divide-y">
+          {(data?.recent ?? []).map((e: any) => (
+            <li key={e.id} className="p-4 flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <div className="font-medium truncate">{e.name} <span className="text-xs text-muted-foreground">· {e.email}</span></div>
+                <div className="text-xs text-muted-foreground truncate">{e.subject || e.message}</div>
+              </div>
+              <span className="text-xs text-muted-foreground shrink-0">{new Date(e.created_at).toLocaleDateString()}</span>
+            </li>
+          ))}
+          {(data?.recent ?? []).length === 0 && <li className="p-6 text-center text-sm text-muted-foreground">No enquiries yet.</li>}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- SETTINGS ---------- */
+function SettingsAdmin() {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-settings"],
+    queryFn: async () => (await supabase.from("settings").select("*").limit(1).maybeSingle()).data,
+  });
+  const [busy, setBusy] = useState(false);
+
+  if (isLoading) return <div className="p-8 text-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div>;
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const payload: any = {
+      company_name: String(fd.get("company_name") ?? "Europe Tourism Bureau"),
+      tagline: String(fd.get("tagline") ?? "") || null,
+      description: String(fd.get("description") ?? "") || null,
+      email: String(fd.get("email") ?? "") || null,
+      phone: String(fd.get("phone") ?? "") || null,
+      whatsapp_number: String(fd.get("whatsapp_number") ?? "") || null,
+      address: String(fd.get("address") ?? "") || null,
+      logo_url: String(fd.get("logo_url") ?? "") || null,
+      instagram_url: String(fd.get("instagram_url") ?? "") || null,
+      facebook_url: String(fd.get("facebook_url") ?? "") || null,
+      twitter_url: String(fd.get("twitter_url") ?? "") || null,
+      youtube_url: String(fd.get("youtube_url") ?? "") || null,
+      linkedin_url: String(fd.get("linkedin_url") ?? "") || null,
+      notify_email: String(fd.get("notify_email") ?? "") || null,
+    };
+    setBusy(true);
+    const res = data?.id
+      ? await supabase.from("settings").update(payload).eq("id", data.id)
+      : await supabase.from("settings").insert({ ...payload, singleton: true });
+    setBusy(false);
+    if (res.error) return toast.error(res.error.message);
+    toast.success("Settings saved");
+    qc.invalidateQueries({ queryKey: ["admin-settings"] });
+    qc.invalidateQueries({ queryKey: ["site-settings"] });
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="rounded-2xl bg-card border shadow-card p-6 space-y-5 max-w-3xl">
+      <h2 className="font-display text-xl text-primary">Site settings</h2>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Field label="Company name"><Input name="company_name" defaultValue={data?.company_name ?? ""} required /></Field>
+        <Field label="Tagline"><Input name="tagline" defaultValue={data?.tagline ?? ""} /></Field>
+      </div>
+      <Field label="Description"><Textarea name="description" rows={2} defaultValue={data?.description ?? ""} /></Field>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Field label="Email"><Input name="email" type="email" defaultValue={data?.email ?? ""} /></Field>
+        <Field label="Notify email (new enquiries)"><Input name="notify_email" type="email" defaultValue={data?.notify_email ?? ""} placeholder="ops@yoursite.com" /></Field>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Field label="Phone"><Input name="phone" defaultValue={data?.phone ?? ""} /></Field>
+        <Field label="WhatsApp number (intl, no +)"><Input name="whatsapp_number" defaultValue={data?.whatsapp_number ?? ""} placeholder="447700000000" /></Field>
+      </div>
+      <Field label="Address"><Input name="address" defaultValue={data?.address ?? ""} /></Field>
+      <ImageUploader name="logo_url" bucket="banners" defaultUrl={data?.logo_url} label="Logo" />
+      <div className="grid sm:grid-cols-2 gap-4 pt-3 border-t">
+        <Field label="Instagram URL"><Input name="instagram_url" defaultValue={data?.instagram_url ?? ""} /></Field>
+        <Field label="Facebook URL"><Input name="facebook_url" defaultValue={data?.facebook_url ?? ""} /></Field>
+        <Field label="Twitter / X URL"><Input name="twitter_url" defaultValue={data?.twitter_url ?? ""} /></Field>
+        <Field label="YouTube URL"><Input name="youtube_url" defaultValue={data?.youtube_url ?? ""} /></Field>
+        <Field label="LinkedIn URL"><Input name="linkedin_url" defaultValue={data?.linkedin_url ?? ""} /></Field>
+      </div>
+      <Button type="submit" disabled={busy} className="bg-primary text-primary-foreground hover:bg-primary-glow">
+        {busy && <Loader2 className="h-4 w-4 mr-1 animate-spin" />} Save settings
+      </Button>
+    </form>
+  );
+}
+
+/* ---------- MEDIA LIBRARY ---------- */
+const MEDIA_BUCKETS = ["tours", "destinations", "blogs", "banners"] as const;
+type MediaBucket = (typeof MEDIA_BUCKETS)[number];
+
+function MediaAdmin() {
+  const [bucket, setBucket] = useState<MediaBucket>("tours");
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        {MEDIA_BUCKETS.map((b) => (
+          <button key={b} onClick={() => setBucket(b)} className={`px-3 py-1.5 text-sm rounded-full border ${bucket === b ? "bg-primary text-primary-foreground border-primary" : "hover:bg-accent"}`}>
+            {b}
+          </button>
+        ))}
+      </div>
+      <MediaBucketView bucket={bucket} />
+    </div>
+  );
+}
+
+function MediaBucketView({ bucket }: { bucket: MediaBucket }) {
+  const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const { data, isLoading } = useQuery({
+    queryKey: ["media", bucket],
+    queryFn: async () => {
+      const { data, error } = await supabase.storage.from(bucket).list("", { limit: 200, sortBy: { column: "created_at", order: "desc" } });
+      if (error) throw error;
+      const files = (data ?? []).filter((f) => f.name && !f.name.endsWith("/"));
+      const signed = await Promise.all(
+        files.map(async (f) => {
+          const { data: s } = await supabase.storage.from(bucket).createSignedUrl(f.name, 60 * 60 * 24 * 365);
+          return { name: f.name, url: s?.signedUrl ?? "", size: (f as any).metadata?.size as number | undefined };
+        }),
+      );
+      return signed;
+    },
+  });
+
+  async function onPick(files: FileList | null) {
+    if (!files?.length) return;
+    setBusy(true);
+    try {
+      for (const f of Array.from(files)) {
+        await uploadToBucket(f, bucket);
+      }
+      toast.success(`Uploaded ${files.length} file(s)`);
+      qc.invalidateQueries({ queryKey: ["media", bucket] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Upload failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function remove(name: string) {
+    if (!confirm(`Delete ${name}?`)) return;
+    const { error } = await supabase.storage.from(bucket).remove([name]);
+    if (error) return toast.error(error.message);
+    toast.success("Deleted");
+    qc.invalidateQueries({ queryKey: ["media", bucket] });
+  }
+
+  return (
+    <div className="rounded-2xl bg-card border shadow-card p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-display text-lg text-primary capitalize">{bucket}</h2>
+        <label className="inline-flex items-center gap-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary-glow px-3 py-2 cursor-pointer">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+          Upload
+          <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => { onPick(e.target.files); e.target.value = ""; }} />
+        </label>
+      </div>
+      {isLoading ? (
+        <div className="p-8 text-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {(data ?? []).map((f) => (
+            <div key={f.name} className="group relative rounded-lg overflow-hidden border bg-muted/30">
+              <img src={f.url} alt={f.name} className="w-full aspect-square object-cover" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                <button type="button" onClick={() => { navigator.clipboard.writeText(f.url); toast.success("URL copied"); }} className="bg-white text-primary p-2 rounded-full" title="Copy URL"><Copy className="h-4 w-4" /></button>
+                <a href={f.url} target="_blank" rel="noreferrer" className="bg-white text-primary p-2 rounded-full" title="Open"><ExternalLink className="h-4 w-4" /></a>
+                <button type="button" onClick={() => remove(f.name)} className="bg-white text-destructive p-2 rounded-full" title="Delete"><Trash2 className="h-4 w-4" /></button>
+              </div>
+              <div className="p-1.5 text-[10px] text-muted-foreground truncate" title={f.name}>{f.name}</div>
+            </div>
+          ))}
+          {(data ?? []).length === 0 && (
+            <div className="col-span-full text-center text-sm text-muted-foreground py-8 flex flex-col items-center gap-2">
+              <ImageIcon className="h-8 w-8 opacity-40" />
+              No files yet. Upload your first image.
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
