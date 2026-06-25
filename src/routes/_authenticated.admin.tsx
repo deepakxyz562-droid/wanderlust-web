@@ -205,7 +205,7 @@ function TourDialog({ tour, destinations, onSaved }: { tour?: any; destinations:
           <Field label="Highlights (one per line)"><Textarea name="highlights" rows={3} defaultValue={(tour?.highlights ?? []).join("\n")} /></Field>
           <Field label="Inclusions (one per line)"><Textarea name="inclusions" rows={3} defaultValue={(tour?.inclusions ?? []).join("\n")} /></Field>
           <Field label="Exclusions (one per line)"><Textarea name="exclusions" rows={2} defaultValue={(tour?.exclusions ?? []).join("\n")} /></Field>
-          <Field label="Featured image URL"><Input name="featured_image" defaultValue={tour?.featured_image ?? ""} placeholder="https://..." /></Field>
+          <ImageUploader name="featured_image" bucket="tours" defaultUrl={tour?.featured_image} />
           <Field label="SEO title"><Input name="seo_title" defaultValue={tour?.seo_title ?? ""} /></Field>
           <Field label="SEO description"><Textarea name="seo_description" rows={2} defaultValue={tour?.seo_description ?? ""} /></Field>
           <div className="flex gap-6">
@@ -298,7 +298,7 @@ function DestinationDialog({ destination, onSaved }: { destination?: any; onSave
           </div>
           <Field label="Short description"><Input name="short_description" defaultValue={destination?.short_description ?? ""} /></Field>
           <Field label="Full description"><Textarea name="description" rows={5} defaultValue={destination?.description ?? ""} /></Field>
-          <Field label="Featured image URL"><Input name="featured_image" defaultValue={destination?.featured_image ?? ""} /></Field>
+          <ImageUploader name="featured_image" bucket="destinations" defaultUrl={destination?.featured_image} />
           <Field label="SEO title"><Input name="seo_title" defaultValue={destination?.seo_title ?? ""} /></Field>
           <Field label="SEO description"><Textarea name="seo_description" rows={2} defaultValue={destination?.seo_description ?? ""} /></Field>
           <div className="flex gap-6">
@@ -387,8 +387,8 @@ function BlogDialog({ post, onSaved }: { post?: any; onSaved: () => void }) {
             <Field label="Author"><Input name="author_name" defaultValue={post?.author_name ?? ""} /></Field>
           </div>
           <Field label="Excerpt"><Textarea name="excerpt" rows={2} defaultValue={post?.excerpt ?? ""} /></Field>
-          <Field label="Content"><Textarea name="content" rows={10} defaultValue={post?.content ?? ""} /></Field>
-          <Field label="Featured image URL"><Input name="featured_image" defaultValue={post?.featured_image ?? ""} /></Field>
+          <Field label="Content"><RichTextEditor name="content" defaultValue={post?.content ?? ""} bucket="blogs" /></Field>
+          <ImageUploader name="featured_image" bucket="blogs" defaultUrl={post?.featured_image} />
           <Field label="SEO title"><Input name="seo_title" defaultValue={post?.seo_title ?? ""} /></Field>
           <Field label="SEO description"><Textarea name="seo_description" rows={2} defaultValue={post?.seo_description ?? ""} /></Field>
           <label className="flex items-center gap-2 text-sm"><Switch name="is_published" defaultChecked={post?.is_published ?? true} /> Published</label>
@@ -406,38 +406,81 @@ function BlogDialog({ post, onSaved }: { post?: any; onSaved: () => void }) {
 /* ---------- ENQUIRIES ---------- */
 function EnquiriesAdmin() {
   const qc = useQueryClient();
+  const [q, setQ] = useState("");
+  const [filter, setFilter] = useState<"all" | "new" | "contacted">("all");
   const { data, isLoading } = useQuery({
     queryKey: ["admin-enquiries"],
     queryFn: async () => (await supabase.from("enquiries").select("*").order("created_at", { ascending: false })).data ?? [],
   });
-  const list = useMemo(() => data ?? [], [data]);
+  const list = useMemo(() => {
+    const arr = (data ?? []) as any[];
+    const ql = q.trim().toLowerCase();
+    return arr.filter((e) => {
+      if (filter !== "all" && (e.status ?? "new") !== filter) return false;
+      if (!ql) return true;
+      return [e.name, e.email, e.phone, e.subject, e.message].some((f) => String(f ?? "").toLowerCase().includes(ql));
+    });
+  }, [data, q, filter]);
+
+  async function setStatus(id: string, status: string) {
+    const { error } = await supabase.from("enquiries").update({ status }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(status === "contacted" ? "Marked as contacted" : "Reopened");
+    qc.invalidateQueries({ queryKey: ["admin-enquiries"] });
+  }
+
   return (
     <div className="rounded-2xl bg-card border shadow-card overflow-hidden">
-      <div className="p-5 border-b flex items-center justify-between">
-        <h2 className="font-display text-xl text-primary">Enquiries</h2>
-        <span className="text-xs text-muted-foreground">{list.length} total</span>
+      <div className="p-5 border-b flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h2 className="font-display text-xl text-primary">Enquiries</h2>
+          <span className="text-xs text-muted-foreground">{list.length} shown</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {(["all", "new", "contacted"] as const).map((f) => (
+            <button key={f} onClick={() => setFilter(f)} className={`px-2.5 py-1 text-xs rounded-full border ${filter === f ? "bg-primary text-primary-foreground border-primary" : "hover:bg-accent"}`}>
+              {f[0].toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+          <div className="relative">
+            <Search className="h-3.5 w-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" className="h-8 pl-7 w-56" />
+          </div>
+        </div>
       </div>
       {isLoading && <div className="p-8 text-center text-muted-foreground"><Loader2 className="h-5 w-5 animate-spin inline" /></div>}
       <ul className="divide-y">
-        {list.map((e) => (
-          <li key={e.id} className="p-5 grid gap-2">
-            <div className="flex justify-between items-start gap-3">
-              <div>
-                <div className="font-semibold">{e.name} <span className="text-muted-foreground font-normal">· {e.email}</span></div>
-                <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()} · {e.phone ?? "no phone"}</div>
-                {e.subject && <div className="text-sm text-primary mt-1">{e.subject}</div>}
+        {list.map((e: any) => {
+          const contacted = e.status === "contacted";
+          return (
+            <li key={e.id} className="p-5 grid gap-2">
+              <div className="flex justify-between items-start gap-3">
+                <div>
+                  <div className="font-semibold flex items-center gap-2">
+                    {e.name}
+                    <span className="text-muted-foreground font-normal">· {e.email}</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${contacted ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>{contacted ? "contacted" : "new"}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()} · {e.phone ?? "no phone"}</div>
+                  {e.subject && <div className="text-sm text-primary mt-1">{e.subject}</div>}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button size="sm" variant="outline" onClick={() => setStatus(e.id, contacted ? "new" : "contacted")}>
+                    <CheckCircle2 className="h-4 w-4 mr-1" />{contacted ? "Reopen" : "Contacted"}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={async () => {
+                    if (!confirm("Delete enquiry?")) return;
+                    const { error } = await supabase.from("enquiries").delete().eq("id", e.id);
+                    if (error) return toast.error(error.message);
+                    qc.invalidateQueries({ queryKey: ["admin-enquiries"] });
+                  }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                </div>
               </div>
-              <Button size="sm" variant="ghost" onClick={async () => {
-                if (!confirm("Delete enquiry?")) return;
-                const { error } = await supabase.from("enquiries").delete().eq("id", e.id);
-                if (error) return toast.error(error.message);
-                qc.invalidateQueries({ queryKey: ["admin-enquiries"] });
-              }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-            </div>
-            <p className="text-sm whitespace-pre-line text-foreground/80">{e.message}</p>
-          </li>
-        ))}
-        {!isLoading && list.length === 0 && <li className="p-8 text-center text-muted-foreground">No enquiries yet.</li>}
+              <p className="text-sm whitespace-pre-line text-foreground/80">{e.message}</p>
+            </li>
+          );
+        })}
+        {!isLoading && list.length === 0 && <li className="p-8 text-center text-muted-foreground">No enquiries match.</li>}
       </ul>
     </div>
   );
@@ -566,7 +609,7 @@ function CityDialog({ city, destinations, onSaved }: { city?: any; destinations:
           </div>
           <Field label="Short description"><Input name="short_description" defaultValue={city?.short_description ?? ""} /></Field>
           <Field label="Full description"><Textarea name="description" rows={5} defaultValue={city?.description ?? ""} /></Field>
-          <Field label="Featured image URL"><Input name="featured_image" defaultValue={city?.featured_image ?? ""} placeholder="https://..." /></Field>
+          <ImageUploader name="featured_image" bucket="destinations" defaultUrl={city?.featured_image} label="City image" />
           <label className="flex items-center gap-2 text-sm"><Switch name="is_published" defaultChecked={city?.is_published ?? true} /> Published</label>
           <DialogFooter>
             <Button type="submit" disabled={busy} className="bg-primary text-primary-foreground hover:bg-primary-glow">
