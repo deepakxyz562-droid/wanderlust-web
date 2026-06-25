@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { LogOut, Plus, Pencil, Trash2, Loader2, ExternalLink } from "lucide-react";
+import { LogOut, Plus, Pencil, Trash2, Loader2, ExternalLink, Copy, Image as ImageIcon, LayoutDashboard, Settings as SettingsIcon, FolderOpen, Map, MapPin, BookOpen, Inbox, Building2, Search, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,8 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/etb-logo.png.asset.json";
 import { SITE } from "@/lib/site";
+import { ImageUploader, uploadToBucket } from "@/components/admin/ImageUploader";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -71,19 +73,25 @@ function AdminPage() {
             Your account doesn't have admin privileges yet. Ask an existing admin to grant access, or remove all admins and sign up again as the first user.
           </div>
         )}
-        <Tabs defaultValue="tours">
-          <TabsList className="bg-card">
-            <TabsTrigger value="tours">Tours</TabsTrigger>
-            <TabsTrigger value="destinations">Destinations</TabsTrigger>
-            <TabsTrigger value="cities">Cities</TabsTrigger>
-            <TabsTrigger value="blogs">Blog posts</TabsTrigger>
-            <TabsTrigger value="enquiries">Enquiries</TabsTrigger>
+        <Tabs defaultValue="dashboard">
+          <TabsList className="bg-card flex-wrap h-auto">
+            <TabsTrigger value="dashboard"><LayoutDashboard className="h-4 w-4 mr-1" />Dashboard</TabsTrigger>
+            <TabsTrigger value="tours"><Map className="h-4 w-4 mr-1" />Tours</TabsTrigger>
+            <TabsTrigger value="destinations"><MapPin className="h-4 w-4 mr-1" />Destinations</TabsTrigger>
+            <TabsTrigger value="cities"><Building2 className="h-4 w-4 mr-1" />Cities</TabsTrigger>
+            <TabsTrigger value="blogs"><BookOpen className="h-4 w-4 mr-1" />Blog</TabsTrigger>
+            <TabsTrigger value="enquiries"><Inbox className="h-4 w-4 mr-1" />Enquiries</TabsTrigger>
+            <TabsTrigger value="media"><FolderOpen className="h-4 w-4 mr-1" />Media</TabsTrigger>
+            <TabsTrigger value="settings"><SettingsIcon className="h-4 w-4 mr-1" />Settings</TabsTrigger>
           </TabsList>
+          <TabsContent value="dashboard" className="mt-6"><DashboardAdmin /></TabsContent>
           <TabsContent value="tours" className="mt-6"><ToursAdmin /></TabsContent>
           <TabsContent value="destinations" className="mt-6"><DestinationsAdmin /></TabsContent>
           <TabsContent value="cities" className="mt-6"><CitiesAdmin /></TabsContent>
           <TabsContent value="blogs" className="mt-6"><BlogsAdmin /></TabsContent>
           <TabsContent value="enquiries" className="mt-6"><EnquiriesAdmin /></TabsContent>
+          <TabsContent value="media" className="mt-6"><MediaAdmin /></TabsContent>
+          <TabsContent value="settings" className="mt-6"><SettingsAdmin /></TabsContent>
         </Tabs>
       </main>
     </div>
