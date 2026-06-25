@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { SITE, whatsappLink } from "@/lib/site";
+import { SITE } from "@/lib/site";
+import { useSiteSettings } from "@/hooks/use-site-settings";
 import { PageHeader } from "./tours";
 
 const schema = z.object({
@@ -41,6 +42,7 @@ export const Route = createFileRoute("/contact")({
 
 function ContactPage() {
   const search = Route.useSearch();
+  const { settings, whatsappLink } = useSiteSettings();
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -61,11 +63,26 @@ function ContactPage() {
       subject: parsed.data.subject || (search.tour ? `Interest: ${search.tour}` : null),
       message: parsed.data.message,
     });
-    setSubmitting(false);
     if (error) {
+      setSubmitting(false);
       toast.error("Couldn't send right now. Please try again.");
       return;
     }
+    // Fire-and-forget email notification to admin
+    try {
+      await supabase.functions.invoke("notify-enquiry", {
+        body: {
+          name: parsed.data.name,
+          email: parsed.data.email,
+          phone: parsed.data.phone || null,
+          subject: parsed.data.subject || (search.tour ? `Interest: ${search.tour}` : null),
+          message: parsed.data.message,
+        },
+      });
+    } catch {
+      /* email is best-effort */
+    }
+    setSubmitting(false);
     toast.success("Thank you! We'll be in touch within 24 hours.");
     setDone(true);
     e.currentTarget.reset();
@@ -79,9 +96,9 @@ function ContactPage() {
           <div className="rounded-2xl bg-card p-6 shadow-card">
             <h3 className="font-display text-xl text-primary mb-4">Get in touch</h3>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-3"><MapPin className="h-4 w-4 text-gold mt-1" /> {SITE.address}</li>
-              <li className="flex items-start gap-3"><Phone className="h-4 w-4 text-gold mt-1" /> {SITE.phone}</li>
-              <li className="flex items-start gap-3"><Mail className="h-4 w-4 text-gold mt-1" /> {SITE.email}</li>
+              <li className="flex items-start gap-3"><MapPin className="h-4 w-4 text-gold mt-1" /> {settings.address}</li>
+              <li className="flex items-start gap-3"><Phone className="h-4 w-4 text-gold mt-1" /> {settings.phone}</li>
+              <li className="flex items-start gap-3"><Mail className="h-4 w-4 text-gold mt-1" /> {settings.email}</li>
             </ul>
             <a href={whatsappLink()} target="_blank" rel="noopener noreferrer"
               className="mt-5 block text-center rounded-md bg-[#25D366] text-white py-2.5 text-sm font-medium hover:opacity-90">
