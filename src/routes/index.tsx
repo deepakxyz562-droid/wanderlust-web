@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Calendar, Globe, MapPin, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Calendar, Globe, MapPin, ShieldCheck, Star } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { HeroSlider } from "@/components/site/HeroSlider";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice, SITE } from "@/lib/site";
-import heroImg from "@/assets/hero-europe.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
