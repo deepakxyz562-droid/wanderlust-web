@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Calendar, Globe, MapPin, ShieldCheck, Sparkles, Star } from "lucide-react";
+import { ArrowRight, Calendar, Globe, MapPin, ShieldCheck, Star } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { HeroSlider } from "@/components/site/HeroSlider";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice, SITE } from "@/lib/site";
-import heroImg from "@/assets/hero-europe.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -68,32 +68,8 @@ function HomePage() {
   return (
     <SiteLayout>
       {/* HERO */}
-      <section className="relative h-[88vh] min-h-[600px] w-full overflow-hidden">
-        <img src={heroImg} alt="Sunset over Santorini, Greece" width={1920} height={1280} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-hero-gradient" />
-        <div className="relative container-page h-full flex flex-col justify-center text-white">
-          <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 backdrop-blur px-3 py-1 text-xs uppercase tracking-[0.2em] text-gold border border-white/20">
-              <Sparkles className="h-3 w-3" /> Curated since 2008
-            </span>
-            <h1 className="mt-6 font-display text-5xl md:text-7xl font-bold leading-[1.05]">
-              Unforgettable Journeys <br />
-              <span className="text-gold-gradient">across Europe</span>
-            </h1>
-            <p className="mt-6 text-lg md:text-xl text-white/85 max-w-xl leading-relaxed">
-              From Mediterranean coasts to alpine peaks — escorted tours and tailor-made holidays designed by Europe specialists.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-gold text-gold-foreground hover:bg-gold/90 h-12 px-6 text-base font-semibold">
-                <Link to="/tours">Explore Tours <ArrowRight className="ml-2 h-4 w-4" /></Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="h-12 px-6 text-base bg-white/10 text-white border-white/30 hover:bg-white hover:text-primary backdrop-blur">
-                <Link to="/contact">Plan with an expert</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSlider />
+
 
       {/* TRUST STRIP */}
       <section className="border-y border-border bg-secondary/40">
