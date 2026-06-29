@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Calendar, Globe, MapPin, ShieldCheck, Star } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { HeroSlider } from "@/components/site/HeroSlider";
+import { VariationSwitcher } from "@/components/site/VariationSwitcher";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice, SITE } from "@/lib/site";
@@ -193,6 +194,8 @@ function HomePage() {
           </div>
         </div>
       </section>
+
+      <VariationSwitcher />
     </SiteLayout>
   );
 }
