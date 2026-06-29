@@ -25,6 +25,9 @@ import { Route as ToursIndexRouteImport } from './routes/tours.index'
 import { Route as DestinationsIndexRouteImport } from './routes/destinations.index'
 import { Route as TravelStylesStyleRouteImport } from './routes/travel-styles.$style'
 import { Route as ToursSlugRouteImport } from './routes/tours.$slug'
+import { Route as HomeModernRouteImport } from './routes/home.modern'
+import { Route as HomeLuxuryRouteImport } from './routes/home.luxury'
+import { Route as HomeAgencyRouteImport } from './routes/home.agency'
 import { Route as DestinationsSlugRouteImport } from './routes/destinations.$slug'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
@@ -109,6 +112,21 @@ const ToursSlugRoute = ToursSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ToursRoute,
 } as any)
+const HomeModernRoute = HomeModernRouteImport.update({
+  id: '/home/modern',
+  path: '/home/modern',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeLuxuryRoute = HomeLuxuryRouteImport.update({
+  id: '/home/luxury',
+  path: '/home/luxury',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeAgencyRoute = HomeAgencyRouteImport.update({
+  id: '/home/agency',
+  path: '/home/agency',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DestinationsSlugRoute = DestinationsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -145,6 +163,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
+  '/home/agency': typeof HomeAgencyRoute
+  '/home/luxury': typeof HomeLuxuryRoute
+  '/home/modern': typeof HomeModernRoute
   '/tours/$slug': typeof ToursSlugRoute
   '/travel-styles/$style': typeof TravelStylesStyleRoute
   '/destinations/': typeof DestinationsIndexRoute
@@ -164,6 +185,9 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
+  '/home/agency': typeof HomeAgencyRoute
+  '/home/luxury': typeof HomeLuxuryRoute
+  '/home/modern': typeof HomeModernRoute
   '/tours/$slug': typeof ToursSlugRoute
   '/travel-styles/$style': typeof TravelStylesStyleRoute
   '/destinations': typeof DestinationsIndexRoute
@@ -187,6 +211,9 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/destinations/$slug': typeof DestinationsSlugRoute
+  '/home/agency': typeof HomeAgencyRoute
+  '/home/luxury': typeof HomeLuxuryRoute
+  '/home/modern': typeof HomeModernRoute
   '/tours/$slug': typeof ToursSlugRoute
   '/travel-styles/$style': typeof TravelStylesStyleRoute
   '/destinations/': typeof DestinationsIndexRoute
@@ -210,6 +237,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog/$slug'
     | '/destinations/$slug'
+    | '/home/agency'
+    | '/home/luxury'
+    | '/home/modern'
     | '/tours/$slug'
     | '/travel-styles/$style'
     | '/destinations/'
@@ -229,6 +259,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog/$slug'
     | '/destinations/$slug'
+    | '/home/agency'
+    | '/home/luxury'
+    | '/home/modern'
     | '/tours/$slug'
     | '/travel-styles/$style'
     | '/destinations'
@@ -251,6 +284,9 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/blog/$slug'
     | '/destinations/$slug'
+    | '/home/agency'
+    | '/home/luxury'
+    | '/home/modern'
     | '/tours/$slug'
     | '/travel-styles/$style'
     | '/destinations/'
@@ -271,6 +307,9 @@ export interface RootRouteChildren {
   MiceRoute: typeof MiceRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ToursRoute: typeof ToursRouteWithChildren
+  HomeAgencyRoute: typeof HomeAgencyRoute
+  HomeLuxuryRoute: typeof HomeLuxuryRoute
+  HomeModernRoute: typeof HomeModernRoute
   TravelStylesStyleRoute: typeof TravelStylesStyleRoute
 }
 
@@ -388,6 +427,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToursSlugRouteImport
       parentRoute: typeof ToursRoute
     }
+    '/home/modern': {
+      id: '/home/modern'
+      path: '/home/modern'
+      fullPath: '/home/modern'
+      preLoaderRoute: typeof HomeModernRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home/luxury': {
+      id: '/home/luxury'
+      path: '/home/luxury'
+      fullPath: '/home/luxury'
+      preLoaderRoute: typeof HomeLuxuryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home/agency': {
+      id: '/home/agency'
+      path: '/home/agency'
+      fullPath: '/home/agency'
+      preLoaderRoute: typeof HomeAgencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/destinations/$slug': {
       id: '/destinations/$slug'
       path: '/$slug'
@@ -482,6 +542,9 @@ const rootRouteChildren: RootRouteChildren = {
   MiceRoute: MiceRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ToursRoute: ToursRouteWithChildren,
+  HomeAgencyRoute: HomeAgencyRoute,
+  HomeLuxuryRoute: HomeLuxuryRoute,
+  HomeModernRoute: HomeModernRoute,
   TravelStylesStyleRoute: TravelStylesStyleRoute,
 }
 export const routeTree = rootRouteImport
