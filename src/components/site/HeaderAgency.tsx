@@ -1,3 +1,4 @@
+import logo from "@/assets/etb-logo.png.asset.json";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Mail, Menu, Phone, Search, X, MapPin } from "lucide-react";
@@ -37,7 +38,7 @@ export function HeaderAgency() {
 
       <div className="w-full px-4 lg:px-10 flex items-center gap-6 py-3">
         <Link to="/" className="shrink-0">
-          <img src={settings.logoUrl || "/etb-logo.png"} alt={settings.name} className="h-[60px] w-auto object-contain" />
+          <img src={settings.logoUrl || logo.url} alt={settings.name} className="h-[60px] w-auto object-contain" />
         </Link>
 
         <form onSubmit={submit} className="hidden md:flex flex-1 max-w-2xl items-center bg-secondary rounded-full pl-5 pr-1 py-1 border border-border focus-within:ring-2 focus-within:ring-primary/30">
