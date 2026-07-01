@@ -11,6 +11,7 @@ const VARIATIONS = [
   { to: "/home/luxury", label: "Luxury Gold" },
   { to: "/home/agency", label: "Agency" },
   { to: "/home/modern", label: "Modern" },
+  { to: "/home/signature", label: "Signature" },
 ] as const;
 
 const HEADERS: { id: HeaderVariant; label: string }[] = [
