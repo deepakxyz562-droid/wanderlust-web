@@ -25,6 +25,7 @@ import { Route as ToursIndexRouteImport } from './routes/tours.index'
 import { Route as DestinationsIndexRouteImport } from './routes/destinations.index'
 import { Route as TravelStylesStyleRouteImport } from './routes/travel-styles.$style'
 import { Route as ToursSlugRouteImport } from './routes/tours.$slug'
+import { Route as HomeSignatureRouteImport } from './routes/home.signature'
 import { Route as HomeModernRouteImport } from './routes/home.modern'
 import { Route as HomeLuxuryRouteImport } from './routes/home.luxury'
 import { Route as HomeAgencyRouteImport } from './routes/home.agency'
@@ -112,6 +113,11 @@ const ToursSlugRoute = ToursSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ToursRoute,
 } as any)
+const HomeSignatureRoute = HomeSignatureRouteImport.update({
+  id: '/home/signature',
+  path: '/home/signature',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HomeModernRoute = HomeModernRouteImport.update({
   id: '/home/modern',
   path: '/home/modern',
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/home/agency': typeof HomeAgencyRoute
   '/home/luxury': typeof HomeLuxuryRoute
   '/home/modern': typeof HomeModernRoute
+  '/home/signature': typeof HomeSignatureRoute
   '/tours/$slug': typeof ToursSlugRoute
   '/travel-styles/$style': typeof TravelStylesStyleRoute
   '/destinations/': typeof DestinationsIndexRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/home/agency': typeof HomeAgencyRoute
   '/home/luxury': typeof HomeLuxuryRoute
   '/home/modern': typeof HomeModernRoute
+  '/home/signature': typeof HomeSignatureRoute
   '/tours/$slug': typeof ToursSlugRoute
   '/travel-styles/$style': typeof TravelStylesStyleRoute
   '/destinations': typeof DestinationsIndexRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/home/agency': typeof HomeAgencyRoute
   '/home/luxury': typeof HomeLuxuryRoute
   '/home/modern': typeof HomeModernRoute
+  '/home/signature': typeof HomeSignatureRoute
   '/tours/$slug': typeof ToursSlugRoute
   '/travel-styles/$style': typeof TravelStylesStyleRoute
   '/destinations/': typeof DestinationsIndexRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/home/agency'
     | '/home/luxury'
     | '/home/modern'
+    | '/home/signature'
     | '/tours/$slug'
     | '/travel-styles/$style'
     | '/destinations/'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/home/agency'
     | '/home/luxury'
     | '/home/modern'
+    | '/home/signature'
     | '/tours/$slug'
     | '/travel-styles/$style'
     | '/destinations'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/home/agency'
     | '/home/luxury'
     | '/home/modern'
+    | '/home/signature'
     | '/tours/$slug'
     | '/travel-styles/$style'
     | '/destinations/'
@@ -310,6 +322,7 @@ export interface RootRouteChildren {
   HomeAgencyRoute: typeof HomeAgencyRoute
   HomeLuxuryRoute: typeof HomeLuxuryRoute
   HomeModernRoute: typeof HomeModernRoute
+  HomeSignatureRoute: typeof HomeSignatureRoute
   TravelStylesStyleRoute: typeof TravelStylesStyleRoute
 }
 
@@ -426,6 +439,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/tours/$slug'
       preLoaderRoute: typeof ToursSlugRouteImport
       parentRoute: typeof ToursRoute
+    }
+    '/home/signature': {
+      id: '/home/signature'
+      path: '/home/signature'
+      fullPath: '/home/signature'
+      preLoaderRoute: typeof HomeSignatureRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/home/modern': {
       id: '/home/modern'
@@ -545,18 +565,9 @@ const rootRouteChildren: RootRouteChildren = {
   HomeAgencyRoute: HomeAgencyRoute,
   HomeLuxuryRoute: HomeLuxuryRoute,
   HomeModernRoute: HomeModernRoute,
+  HomeSignatureRoute: HomeSignatureRoute,
   TravelStylesStyleRoute: TravelStylesStyleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

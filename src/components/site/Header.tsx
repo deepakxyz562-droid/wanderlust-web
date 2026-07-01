@@ -109,7 +109,7 @@ export function Header() {
       <div className="w-full px-6 lg:px-10 flex items-center justify-between gap-6 py-2">
         <Link to="/" className="flex items-center shrink-0" aria-label={settings.name}>
           <img
-            src={settings.logoUrl || "/etb-logo.png"}
+            src={settings.logoUrl || logo.url}
             alt={settings.name}
             className="h-[65px] w-auto object-contain"
           />

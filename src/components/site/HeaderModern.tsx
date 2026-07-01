@@ -1,3 +1,4 @@
+import logo from "@/assets/etb-logo.png.asset.json";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Menu, Search, X } from "lucide-react";
@@ -26,7 +27,7 @@ export function HeaderModern() {
       <header className="sticky top-0 z-50 bg-background/70 backdrop-blur-xl border-b border-border/60">
         <div className="w-full px-6 lg:px-12 flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-3">
-            <img src={settings.logoUrl || "/etb-logo.png"} alt={settings.name} className="h-[52px] w-auto object-contain" />
+            <img src={settings.logoUrl || logo.url} alt={settings.name} className="h-[52px] w-auto object-contain" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1 p-1 rounded-full bg-secondary/70 border border-border/60">

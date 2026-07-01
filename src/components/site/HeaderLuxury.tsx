@@ -1,3 +1,4 @@
+import logo from "@/assets/etb-logo.png.asset.json";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X, Phone } from "lucide-react";
@@ -33,7 +34,7 @@ export function HeaderLuxury() {
 
       <div className="w-full px-8 lg:px-14 flex items-center justify-between h-24">
         <Link to="/" className="flex items-center" aria-label={settings.name}>
-          <img src={settings.logoUrl || "/etb-logo.png"} alt={settings.name} className="h-[60px] w-auto object-contain brightness-0 invert" />
+          <img src={settings.logoUrl || logo.url} alt={settings.name} className="h-[60px] w-auto object-contain brightness-0 invert" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-10 text-[12px] tracking-[0.25em] uppercase text-ivory">
